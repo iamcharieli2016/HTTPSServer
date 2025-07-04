@@ -1,0 +1,1075 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>server: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">httpsserver/cmd/server/main.go (0.0%)</option>
+				
+				<option value="file1">httpsserver/config.go (0.0%)</option>
+				
+				<option value="file2">httpsserver/internal/auth/auth.go (100.0%)</option>
+				
+				<option value="file3">httpsserver/internal/config/config.go (100.0%)</option>
+				
+				<option value="file4">httpsserver/internal/database/database.go (8.8%)</option>
+				
+				<option value="file5">httpsserver/internal/handler/handler.go (0.0%)</option>
+				
+				<option value="file6">httpsserver/internal/utils/cert.go (60.0%)</option>
+				
+				<option value="file7">httpsserver/main.go (0.0%)</option>
+				
+				<option value="file8">httpsserver/pkg/response/response.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "fmt"
+        "log"
+
+        "github.com/gin-gonic/gin"
+
+        "httpsserver/internal/auth"
+        "httpsserver/internal/config"
+        "httpsserver/internal/database"
+        "httpsserver/internal/handler"
+        "httpsserver/internal/utils"
+)
+
+func main() <span class="cov0" title="0">{
+        // 加载配置
+        cfg := config.Load()
+
+        // 初始化数据库连接
+        db, err := database.New(cfg)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("数据库初始化失败:", err)
+        }</span>
+        <span class="cov0" title="0">defer db.Close()
+
+        // 初始化认证服务
+        authSvc := auth.New(cfg)
+
+        // 初始化处理器
+        h := handler.New(db, authSvc)
+
+        // 设置Gin为发布模式
+        gin.SetMode(gin.ReleaseMode)
+
+        // 创建Gin引擎
+        r := gin.Default()
+
+        // 添加请求日志记录中间件
+        r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string </span><span class="cov0" title="0">{
+                return fmt.Sprintf("[%s] %s \"%s %s %s\" %d %s \"%s\" \"%s\" %d\n",
+                        param.TimeStamp.Format("2006/01/02 - 15:04:05"),
+                        param.ClientIP,
+                        param.Method,
+                        param.Path,
+                        param.Request.Proto,
+                        param.StatusCode,
+                        param.Latency,
+                        param.Request.UserAgent(),
+                        param.ErrorMessage,
+                        param.BodySize,
+                )
+        }</span>))
+
+        // 添加CORS中间件
+        <span class="cov0" title="0">r.Use(func(c *gin.Context) </span><span class="cov0" title="0">{
+                c.Header("Access-Control-Allow-Origin", "*")
+                c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+                c.Header("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+                if c.Request.Method == "OPTIONS" </span><span class="cov0" title="0">{
+                        c.AbortWithStatus(204)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">c.Next()</span>
+        })
+
+        // 定义路由
+        <span class="cov0" title="0">r.POST("/service/:serviceId", h.HandleServiceRequest)
+
+        // 生成自签名证书（仅用于开发测试）
+        utils.GenerateSelfSignedCert(cfg.Server.CertFile, cfg.Server.KeyFile)
+
+        // 启动HTTPS服务器
+        log.Printf("HTTPS服务器启动在端口%s...", cfg.Server.Port)
+        log.Fatal(r.RunTLS(":"+cfg.Server.Port, cfg.Server.CertFile, cfg.Server.KeyFile))</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package main
+
+import (
+        "os"
+)
+
+// 配置结构体
+type Config struct {
+        // 数据库配置
+        DB struct {
+                Host     string
+                Port     string
+                User     string
+                Password string
+                Database string
+                Charset  string
+        }
+
+        // 服务器配置
+        Server struct {
+                Port     string
+                CertFile string
+                KeyFile  string
+        }
+
+        // 认证配置
+        Auth struct {
+                ClientID     string
+                ClientSecret string
+        }
+}
+
+// 获取配置
+func getConfig() *Config <span class="cov0" title="0">{
+        config := &amp;Config{}
+
+        // 数据库配置（支持环境变量）
+        config.DB.Host = getEnv("DB_HOST", "localhost")
+        config.DB.Port = getEnv("DB_PORT", "3306")
+        config.DB.User = getEnv("DB_USER", "root")
+        config.DB.Password = getEnv("DB_PASSWORD", "")
+        config.DB.Database = getEnv("DB_DATABASE", "metadata_db")
+        config.DB.Charset = getEnv("DB_CHARSET", "utf8mb4")
+
+        // 服务器配置
+        config.Server.Port = getEnv("SERVER_PORT", "18443")
+        config.Server.CertFile = getEnv("SSL_CERT_FILE", "server.crt")
+        config.Server.KeyFile = getEnv("SSL_KEY_FILE", "server.key")
+
+        // 认证配置
+        config.Auth.ClientID = getEnv("CLIENT_ID", "eplat")
+        config.Auth.ClientSecret = getEnv("CLIENT_SECRET", "eplat2019111214440")
+
+        return config
+}</span>
+
+// 获取环境变量，如果不存在则返回默认值
+func getEnv(key, defaultValue string) string <span class="cov0" title="0">{
+        if value := os.Getenv(key); value != "" </span><span class="cov0" title="0">{
+                return value
+        }</span>
+        <span class="cov0" title="0">return defaultValue</span>
+}
+
+// 构建数据库连接字符串
+func (c *Config) GetDSN() string <span class="cov0" title="0">{
+        return c.DB.User + ":" + c.DB.Password + "@tcp(" + c.DB.Host + ":" + c.DB.Port + ")/" + c.DB.Database + "?charset=" + c.DB.Charset + "&amp;parseTime=True&amp;loc=Local"
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package auth
+
+import (
+        "log"
+
+        "httpsserver/internal/config"
+        "httpsserver/internal/model"
+)
+
+// Service 认证服务
+type Service struct {
+        cfg *config.Config
+}
+
+// New 创建新的认证服务
+func New(cfg *config.Config) *Service <span class="cov8" title="1">{
+        return &amp;Service{
+                cfg: cfg,
+        }
+}</span>
+
+// Authenticate 验证客户端认证信息
+func (s *Service) Authenticate(req model.ServiceRequest) bool <span class="cov8" title="1">{
+        // 记录认证尝试
+        log.Printf("🔐 认证请求 - ClientID: %s, UserID: %s", req.ClientID, req.UserID)
+
+        // 验证客户端信息
+        if req.ClientID != s.cfg.Auth.ClientID || req.ClientSecret != s.cfg.Auth.ClientSecret </span><span class="cov8" title="1">{
+                log.Printf("🚫 客户端认证失败 - 期望ClientID: %s, 实际ClientID: %s", s.cfg.Auth.ClientID, req.ClientID)
+                return false
+        }</span>
+
+        <span class="cov8" title="1">log.Printf("✅ 客户端认证成功 - UserID: %s", req.UserID)
+        return true</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package config
+
+import (
+        "os"
+)
+
+// Config 应用配置结构体
+type Config struct {
+        // 数据库配置
+        DB struct {
+                Host     string
+                Port     string
+                User     string
+                Password string
+                Database string
+                Charset  string
+        }
+
+        // 服务器配置
+        Server struct {
+                Port     string
+                CertFile string
+                KeyFile  string
+        }
+
+        // 认证配置
+        Auth struct {
+                ClientID     string
+                ClientSecret string
+        }
+}
+
+// Load 加载配置
+func Load() *Config <span class="cov8" title="1">{
+        config := &amp;Config{}
+
+        // 数据库配置（支持环境变量）
+        config.DB.Host = getEnv("DB_HOST", "localhost")
+        config.DB.Port = getEnv("DB_PORT", "3306")
+        config.DB.User = getEnv("DB_USER", "root")
+        config.DB.Password = getEnv("DB_PASSWORD", "")
+        config.DB.Database = getEnv("DB_DATABASE", "metadata_db")
+        config.DB.Charset = getEnv("DB_CHARSET", "utf8mb4")
+
+        // 服务器配置
+        config.Server.Port = getEnv("SERVER_PORT", "18443")
+        config.Server.CertFile = getEnv("SSL_CERT_FILE", "server.crt")
+        config.Server.KeyFile = getEnv("SSL_KEY_FILE", "server.key")
+
+        // 认证配置
+        config.Auth.ClientID = getEnv("CLIENT_ID", "eplat")
+        config.Auth.ClientSecret = getEnv("CLIENT_SECRET", "eplat2019111214440")
+
+        return config
+}</span>
+
+// GetDSN 构建数据库连接字符串
+func (c *Config) GetDSN() string <span class="cov8" title="1">{
+        return c.DB.User + ":" + c.DB.Password + "@tcp(" + c.DB.Host + ":" + c.DB.Port + ")/" + c.DB.Database + "?charset=" + c.DB.Charset + "&amp;parseTime=True&amp;loc=Local"
+}</span>
+
+// getEnv 获取环境变量，如果不存在则返回默认值
+func getEnv(key, defaultValue string) string <span class="cov8" title="1">{
+        if value := os.Getenv(key); value != "" </span><span class="cov8" title="1">{
+                return value
+        }</span>
+        <span class="cov8" title="1">return defaultValue</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package database
+
+import (
+        "database/sql"
+        "fmt"
+        "log"
+
+        _ "github.com/go-sql-driver/mysql"
+
+        "httpsserver/internal/config"
+        "httpsserver/internal/model"
+)
+
+// DB 数据库连接实例
+type DB struct {
+        conn *sql.DB
+}
+
+// New 创建新的数据库连接
+func New(cfg *config.Config) (*DB, error) <span class="cov8" title="1">{
+        // 连接MySQL数据库
+        dsn := cfg.GetDSN()
+        conn, err := sql.Open("mysql", dsn)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("数据库连接失败: %w", err)
+        }</span>
+
+        // 测试数据库连接
+        <span class="cov8" title="1">err = conn.Ping()
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("数据库ping失败: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">log.Println("数据库连接成功")
+        return &amp;DB{conn: conn}, nil</span>
+}
+
+// Close 关闭数据库连接
+func (db *DB) Close() error <span class="cov0" title="0">{
+        return db.conn.Close()
+}</span>
+
+// QueryMetadata 查询元数据
+func (db *DB) QueryMetadata(req model.ServiceRequest) ([]model.TableMetadata, int64, error) <span class="cov0" title="0">{
+        // 构建查询SQL
+        query := "SELECT table_schema, table_name, table_comment, column_name, column_type, column_comment, db_type FROM table_metadata WHERE 1=1"
+        var args []interface{}
+
+        // 记录搜索条件
+        searchConditions := []string{}
+        if req.Params.TableSchema != "" </span><span class="cov0" title="0">{
+                searchConditions = append(searchConditions, fmt.Sprintf("TableSchema: %s", req.Params.TableSchema))
+        }</span>
+        <span class="cov0" title="0">if req.Params.TableName != "" </span><span class="cov0" title="0">{
+                searchConditions = append(searchConditions, fmt.Sprintf("TableName: %s", req.Params.TableName))
+        }</span>
+        <span class="cov0" title="0">if req.Params.ColumnName != "" </span><span class="cov0" title="0">{
+                searchConditions = append(searchConditions, fmt.Sprintf("ColumnName: %s", req.Params.ColumnName))
+        }</span>
+        <span class="cov0" title="0">if len(searchConditions) &gt; 0 </span><span class="cov0" title="0">{
+                log.Printf("🔎 搜索条件: %v", searchConditions)
+        }</span> else<span class="cov0" title="0"> {
+                log.Printf("📜 查询所有数据（无搜索条件）")
+        }</span>
+
+        // 根据参数添加WHERE条件
+        <span class="cov0" title="0">if req.Params.TableSchema != "" </span><span class="cov0" title="0">{
+                query += " AND table_schema LIKE ?"
+                args = append(args, "%"+req.Params.TableSchema+"%")
+        }</span>
+        <span class="cov0" title="0">if req.Params.TableName != "" </span><span class="cov0" title="0">{
+                query += " AND table_name LIKE ?"
+                args = append(args, "%"+req.Params.TableName+"%")
+        }</span>
+        <span class="cov0" title="0">if req.Params.TableComment != "" </span><span class="cov0" title="0">{
+                query += " AND table_comment LIKE ?"
+                args = append(args, "%"+req.Params.TableComment+"%")
+        }</span>
+        <span class="cov0" title="0">if req.Params.ColumnName != "" </span><span class="cov0" title="0">{
+                query += " AND column_name LIKE ?"
+                args = append(args, "%"+req.Params.ColumnName+"%")
+        }</span>
+        <span class="cov0" title="0">if req.Params.ColumnType != "" </span><span class="cov0" title="0">{
+                query += " AND column_type LIKE ?"
+                args = append(args, "%"+req.Params.ColumnType+"%")
+        }</span>
+        <span class="cov0" title="0">if req.Params.ColumnComment != "" </span><span class="cov0" title="0">{
+                query += " AND column_comment LIKE ?"
+                args = append(args, "%"+req.Params.ColumnComment+"%")
+        }</span>
+        <span class="cov0" title="0">if req.Params.DBType != "" </span><span class="cov0" title="0">{
+                query += " AND db_type LIKE ?"
+                args = append(args, "%"+req.Params.DBType+"%")
+        }</span>
+
+        // 获取总数
+        <span class="cov0" title="0">var total int64
+        if req.ShowCount == "true" </span><span class="cov0" title="0">{
+                countQuery := "SELECT COUNT(*) FROM (" + query + ") AS count_table"
+                err := db.conn.QueryRow(countQuery, args...).Scan(&amp;total)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, 0, fmt.Errorf("查询总数失败: %w", err)
+                }</span>
+                <span class="cov0" title="0">log.Printf("📊 数据总数: %d", total)</span>
+        }
+
+        // 添加分页
+        <span class="cov0" title="0">query += " ORDER BY table_schema, table_name, column_name LIMIT ? OFFSET ?"
+        args = append(args, req.Limit, req.Offset)
+
+        // 执行查询
+        log.Printf("🗃️  执行数据库查询...")
+        rows, err := db.conn.Query(query, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, 0, fmt.Errorf("数据库查询失败: %w", err)
+        }</span>
+        <span class="cov0" title="0">defer rows.Close()
+
+        // 处理查询结果
+        var results []model.TableMetadata
+        for rows.Next() </span><span class="cov0" title="0">{
+                var meta model.TableMetadata
+                err := rows.Scan(
+                        &amp;meta.TableSchema, &amp;meta.TableName, &amp;meta.TableComment,
+                        &amp;meta.ColumnName, &amp;meta.ColumnType, &amp;meta.ColumnComment,
+                        &amp;meta.DBType,
+                )
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, 0, fmt.Errorf("数据扫描失败: %w", err)
+                }</span>
+                <span class="cov0" title="0">results = append(results, meta)</span>
+        }
+
+        <span class="cov0" title="0">log.Printf("✅ 查询成功完成 - 返回记录数: %d", len(results))
+        if req.ShowCount == "true" </span><span class="cov0" title="0">{
+                log.Printf("📈 总记录数: %d, 当前页: %d-%d", total, req.Offset, req.Offset+len(results))
+        }</span>
+
+        <span class="cov0" title="0">return results, total, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package handler
+
+import (
+        "encoding/json"
+        "log"
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+
+        "httpsserver/internal/auth"
+        "httpsserver/internal/database"
+        "httpsserver/internal/model"
+        "httpsserver/pkg/response"
+)
+
+// Handler HTTP处理器
+type Handler struct {
+        db      *database.DB
+        authSvc *auth.Service
+}
+
+// New 创建新的处理器
+func New(db *database.DB, authSvc *auth.Service) *Handler <span class="cov0" title="0">{
+        return &amp;Handler{
+                db:      db,
+                authSvc: authSvc,
+        }
+}</span>
+
+// HandleServiceRequest 处理服务请求
+func (h *Handler) HandleServiceRequest(c *gin.Context) <span class="cov0" title="0">{
+        serviceId := c.Param("serviceId")
+
+        // 记录请求详情
+        log.Printf("🔵 接收到请求 - ServiceID: %s, ClientIP: %s", serviceId, c.ClientIP())
+
+        var req model.ServiceRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                log.Printf("❌ 请求参数解析失败: %v", err)
+                errorResponse := response.NewErrorResponse("请求参数格式错误: " + err.Error())
+
+                // 打印错误返回内容
+                if responseJSON, jsonErr := json.Marshal(errorResponse); jsonErr == nil </span><span class="cov0" title="0">{
+                        log.Printf("📄 错误返回内容: %s", string(responseJSON))
+                }</span>
+
+                <span class="cov0" title="0">c.JSON(http.StatusBadRequest, errorResponse)
+                return</span>
+        }
+
+        // 记录请求参数
+        <span class="cov0" title="0">log.Printf("📋 请求参数 - UserID: %s, ClientID: %s, Offset: %d, Limit: %d",
+                req.UserID, req.ClientID, req.Offset, req.Limit)
+
+        // 验证客户端信息
+        if !h.authSvc.Authenticate(req) </span><span class="cov0" title="0">{
+                authErrorResponse := response.NewErrorResponse("客户端认证失败")
+
+                // 打印认证失败返回内容
+                if responseJSON, jsonErr := json.Marshal(authErrorResponse); jsonErr == nil </span><span class="cov0" title="0">{
+                        log.Printf("📄 认证失败返回内容: %s", string(responseJSON))
+                }</span>
+
+                <span class="cov0" title="0">c.JSON(http.StatusUnauthorized, authErrorResponse)
+                return</span>
+        }
+
+        // 根据serviceId处理不同的服务
+        <span class="cov0" title="0">switch serviceId </span>{
+        case "D_A_BSPDMETA":<span class="cov0" title="0">
+                h.HandleMetadataQuery(c, req)</span>
+        default:<span class="cov0" title="0">
+                notFoundResponse := response.NewErrorResponse("未找到指定的服务: " + serviceId)
+                log.Printf("❌ 服务未找到 - ServiceID: %s", serviceId)
+
+                // 打印服务未找到返回内容
+                if responseJSON, jsonErr := json.Marshal(notFoundResponse); jsonErr == nil </span><span class="cov0" title="0">{
+                        log.Printf("📄 服务未找到返回内容: %s", string(responseJSON))
+                }</span>
+
+                <span class="cov0" title="0">c.JSON(http.StatusNotFound, notFoundResponse)</span>
+        }
+}
+
+// HandleMetadataQuery 处理元数据查询
+func (h *Handler) HandleMetadataQuery(c *gin.Context, req model.ServiceRequest) <span class="cov0" title="0">{
+        log.Printf("🔍 开始处理元数据查询请求")
+
+        // 查询数据库
+        results, total, err := h.db.QueryMetadata(req)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("❌ 数据库查询失败: %v", err)
+                errorResponse := response.NewErrorResponse("数据库查询失败: " + err.Error())
+
+                // 打印数据库查询失败返回内容
+                if responseJSON, jsonErr := json.Marshal(errorResponse); jsonErr == nil </span><span class="cov0" title="0">{
+                        log.Printf("📄 数据库查询失败返回内容: %s", string(responseJSON))
+                }</span>
+
+                <span class="cov0" title="0">c.JSON(http.StatusInternalServerError, errorResponse)
+                return</span>
+        }
+
+        // 构建响应
+        <span class="cov0" title="0">var resp response.ServiceResponse
+        if req.ShowCount == "true" </span><span class="cov0" title="0">{
+                resp = response.NewSuccessResponseWithTotal(results, total)
+        }</span> else<span class="cov0" title="0"> {
+                resp = response.NewSuccessResponse(results)
+        }</span>
+
+        // 打印详细的返回数据内容
+        <span class="cov0" title="0">responseJSON, err := json.Marshal(resp)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("❌ JSON序列化失败: %v", err)
+        }</span> else<span class="cov0" title="0"> {
+                log.Printf("📄 返回数据内容:")
+                log.Printf("%s", string(responseJSON))
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, resp)</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package utils
+
+import (
+        "log"
+        "net/http"
+        "os"
+)
+
+// GenerateSelfSignedCert 生成自签名证书
+func GenerateSelfSignedCert(certFile, keyFile string) <span class="cov8" title="1">{
+        // 检查证书文件是否存在
+        if FileExists(certFile) &amp;&amp; FileExists(keyFile) </span><span class="cov8" title="1">{
+                return
+        }</span>
+
+        <span class="cov0" title="0">log.Println("生成自签名SSL证书...")
+
+        // 这里简化处理，实际生产环境应该使用真实证书
+        // 您可以使用openssl命令生成：
+        // openssl req -x509 -newkey rsa:4096 -keyout server.key -out server.crt -days 365 -nodes -subj "/CN=localhost"
+
+        log.Printf("请手动生成SSL证书文件:")
+        log.Printf("openssl req -x509 -newkey rsa:4096 -keyout %s -out %s -days 365 -nodes -subj \"/CN=localhost\"", keyFile, certFile)
+        log.Fatal("SSL证书文件不存在，请先生成证书文件")</span>
+}
+
+// FileExists 检查文件是否存在
+func FileExists(filename string) bool <span class="cov8" title="1">{
+        _, err := os.Stat(filename)
+        return err == nil
+}</span>
+
+// FileExistsOld 检查文件是否存在（旧版本方法）
+func FileExistsOld(filename string) bool <span class="cov8" title="1">{
+        _, err := http.Dir(".").Open(filename)
+        return err == nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package main
+
+import (
+        "database/sql"
+        "encoding/json"
+        "fmt"
+        "log"
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+        _ "github.com/go-sql-driver/mysql"
+)
+
+// 请求结构体
+type ServiceRequest struct {
+        Params struct {
+                ColumnComment string `json:"columnComment"`
+                ColumnType    string `json:"columnType"`
+                ColumnName    string `json:"columnName"`
+                TableComment  string `json:"tableComment"`
+                TableName     string `json:"tableName"`
+                TableSchema   string `json:"tableSchema"`
+                DBType        string `json:"dbType"`
+        } `json:"params"`
+        ServiceID    string `json:"serviceId"`
+        ShowCount    string `json:"showCount"`
+        Offset       int    `json:"offset"`
+        Limit        int    `json:"limit"`
+        UserID       string `json:"userId"`
+        ClientID     string `json:"clientId"`
+        ClientSecret string `json:"clientSecret"`
+}
+
+// 响应结构体
+type ServiceResponse struct {
+        Success bool        `json:"success"`
+        Data    interface{} `json:"data"`
+        Total   int64       `json:"total,omitempty"`
+        Message string      `json:"message,omitempty"`
+}
+
+// 数据库表结构信息
+type TableMetadata struct {
+        TableSchema   string `json:"tableSchema"`
+        TableName     string `json:"tableName"`
+        TableComment  string `json:"tableComment"`
+        ColumnName    string `json:"columnName"`
+        ColumnType    string `json:"columnType"`
+        ColumnComment string `json:"columnComment"`
+        DBType        string `json:"dbType"`
+}
+
+var db *sql.DB
+var config *Config
+
+func main() <span class="cov0" title="0">{
+        // 加载配置
+        config = getConfig()
+
+        // 初始化数据库连接
+        initDB()
+        defer db.Close()
+
+        // 设置Gin为发布模式
+        gin.SetMode(gin.ReleaseMode)
+
+        // 创建Gin引擎
+        r := gin.Default()
+
+        // 添加请求日志记录中间件
+        r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string </span><span class="cov0" title="0">{
+                return fmt.Sprintf("[%s] %s \"%s %s %s\" %d %s \"%s\" \"%s\" %d\n",
+                        param.TimeStamp.Format("2006/01/02 - 15:04:05"),
+                        param.ClientIP,
+                        param.Method,
+                        param.Path,
+                        param.Request.Proto,
+                        param.StatusCode,
+                        param.Latency,
+                        param.Request.UserAgent(),
+                        param.ErrorMessage,
+                        param.BodySize,
+                )
+        }</span>))
+
+        // 添加CORS中间件
+        <span class="cov0" title="0">r.Use(func(c *gin.Context) </span><span class="cov0" title="0">{
+                c.Header("Access-Control-Allow-Origin", "*")
+                c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+                c.Header("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+                if c.Request.Method == "OPTIONS" </span><span class="cov0" title="0">{
+                        c.AbortWithStatus(204)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">c.Next()</span>
+        })
+
+        // 定义路由
+        <span class="cov0" title="0">r.POST("/service/:serviceId", handleServiceRequest)
+
+        // 生成自签名证书（仅用于开发测试）
+        generateSelfSignedCert()
+
+        // 启动HTTPS服务器
+        log.Printf("HTTPS服务器启动在端口%s...", config.Server.Port)
+        log.Fatal(r.RunTLS(":"+config.Server.Port, config.Server.CertFile, config.Server.KeyFile))</span>
+}
+
+func initDB() <span class="cov0" title="0">{
+        var err error
+        // 连接MySQL数据库
+        dsn := config.GetDSN()
+        db, err = sql.Open("mysql", dsn)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("数据库连接失败:", err)
+        }</span>
+
+        // 测试数据库连接
+        <span class="cov0" title="0">err = db.Ping()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("数据库ping失败:", err)
+        }</span>
+
+        <span class="cov0" title="0">log.Println("数据库连接成功")</span>
+}
+
+func handleServiceRequest(c *gin.Context) <span class="cov0" title="0">{
+        serviceId := c.Param("serviceId")
+
+        // 记录请求详情
+        log.Printf("🔵 接收到请求 - ServiceID: %s, ClientIP: %s", serviceId, c.ClientIP())
+
+        var req ServiceRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                log.Printf("❌ 请求参数解析失败: %v", err)
+                errorResponse := ServiceResponse{
+                        Success: false,
+                        Message: "请求参数格式错误: " + err.Error(),
+                }
+                // 打印错误返回内容
+                if responseJSON, jsonErr := json.Marshal(errorResponse); jsonErr == nil </span><span class="cov0" title="0">{
+                        log.Printf("📄 错误返回内容: %s", string(responseJSON))
+                }</span>
+                <span class="cov0" title="0">c.JSON(http.StatusBadRequest, errorResponse)
+                return</span>
+        }
+
+        // 记录请求参数
+        <span class="cov0" title="0">log.Printf("📋 请求参数 - UserID: %s, ClientID: %s, Offset: %d, Limit: %d",
+                req.UserID, req.ClientID, req.Offset, req.Limit)
+
+        // 验证客户端信息
+        if req.ClientID != config.Auth.ClientID || req.ClientSecret != config.Auth.ClientSecret </span><span class="cov0" title="0">{
+                log.Printf("🚫 客户端认证失败 - ClientID: %s", req.ClientID)
+                authErrorResponse := ServiceResponse{
+                        Success: false,
+                        Message: "客户端认证失败",
+                }
+                // 打印认证失败返回内容
+                if responseJSON, jsonErr := json.Marshal(authErrorResponse); jsonErr == nil </span><span class="cov0" title="0">{
+                        log.Printf("📄 认证失败返回内容: %s", string(responseJSON))
+                }</span>
+                <span class="cov0" title="0">c.JSON(http.StatusUnauthorized, authErrorResponse)
+                return</span>
+        }
+
+        <span class="cov0" title="0">log.Printf("✅ 客户端认证成功 - UserID: %s", req.UserID)
+
+        // 根据serviceId处理不同的服务
+        switch serviceId </span>{
+        case "D_A_BSPDMETA":<span class="cov0" title="0">
+                handleMetadataQuery(c, req)</span>
+        default:<span class="cov0" title="0">
+                notFoundResponse := ServiceResponse{
+                        Success: false,
+                        Message: "未找到指定的服务: " + serviceId,
+                }
+                log.Printf("❌ 服务未找到 - ServiceID: %s", serviceId)
+                // 打印服务未找到返回内容
+                if responseJSON, jsonErr := json.Marshal(notFoundResponse); jsonErr == nil </span><span class="cov0" title="0">{
+                        log.Printf("📄 服务未找到返回内容: %s", string(responseJSON))
+                }</span>
+                <span class="cov0" title="0">c.JSON(http.StatusNotFound, notFoundResponse)</span>
+        }
+}
+
+func handleMetadataQuery(c *gin.Context, req ServiceRequest) <span class="cov0" title="0">{
+        log.Printf("🔍 开始处理元数据查询请求")
+
+        // 构建查询SQL
+        query := "SELECT table_schema, table_name, table_comment, column_name, column_type, column_comment, db_type FROM table_metadata WHERE 1=1"
+        var args []interface{}
+
+        // 记录搜索条件
+        searchConditions := []string{}
+        if req.Params.TableSchema != "" </span><span class="cov0" title="0">{
+                searchConditions = append(searchConditions, fmt.Sprintf("TableSchema: %s", req.Params.TableSchema))
+        }</span>
+        <span class="cov0" title="0">if req.Params.TableName != "" </span><span class="cov0" title="0">{
+                searchConditions = append(searchConditions, fmt.Sprintf("TableName: %s", req.Params.TableName))
+        }</span>
+        <span class="cov0" title="0">if req.Params.ColumnName != "" </span><span class="cov0" title="0">{
+                searchConditions = append(searchConditions, fmt.Sprintf("ColumnName: %s", req.Params.ColumnName))
+        }</span>
+        <span class="cov0" title="0">if len(searchConditions) &gt; 0 </span><span class="cov0" title="0">{
+                log.Printf("🔎 搜索条件: %v", searchConditions)
+        }</span> else<span class="cov0" title="0"> {
+                log.Printf("📜 查询所有数据（无搜索条件）")
+        }</span>
+
+        // 根据参数添加WHERE条件
+        <span class="cov0" title="0">if req.Params.TableSchema != "" </span><span class="cov0" title="0">{
+                query += " AND table_schema LIKE ?"
+                args = append(args, "%"+req.Params.TableSchema+"%")
+        }</span>
+        <span class="cov0" title="0">if req.Params.TableName != "" </span><span class="cov0" title="0">{
+                query += " AND table_name LIKE ?"
+                args = append(args, "%"+req.Params.TableName+"%")
+        }</span>
+        <span class="cov0" title="0">if req.Params.TableComment != "" </span><span class="cov0" title="0">{
+                query += " AND table_comment LIKE ?"
+                args = append(args, "%"+req.Params.TableComment+"%")
+        }</span>
+        <span class="cov0" title="0">if req.Params.ColumnName != "" </span><span class="cov0" title="0">{
+                query += " AND column_name LIKE ?"
+                args = append(args, "%"+req.Params.ColumnName+"%")
+        }</span>
+        <span class="cov0" title="0">if req.Params.ColumnType != "" </span><span class="cov0" title="0">{
+                query += " AND column_type LIKE ?"
+                args = append(args, "%"+req.Params.ColumnType+"%")
+        }</span>
+        <span class="cov0" title="0">if req.Params.ColumnComment != "" </span><span class="cov0" title="0">{
+                query += " AND column_comment LIKE ?"
+                args = append(args, "%"+req.Params.ColumnComment+"%")
+        }</span>
+        <span class="cov0" title="0">if req.Params.DBType != "" </span><span class="cov0" title="0">{
+                query += " AND db_type LIKE ?"
+                args = append(args, "%"+req.Params.DBType+"%")
+        }</span>
+
+        // 获取总数
+        <span class="cov0" title="0">var total int64
+        if req.ShowCount == "true" </span><span class="cov0" title="0">{
+                countQuery := "SELECT COUNT(*) FROM (" + query + ") AS count_table"
+                err := db.QueryRow(countQuery, args...).Scan(&amp;total)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("❌ 查询总数失败: %v", err)
+                        countErrorResponse := ServiceResponse{
+                                Success: false,
+                                Message: "查询总数失败: " + err.Error(),
+                        }
+                        // 打印查询总数失败返回内容
+                        if responseJSON, jsonErr := json.Marshal(countErrorResponse); jsonErr == nil </span><span class="cov0" title="0">{
+                                log.Printf("📄 查询总数失败返回内容: %s", string(responseJSON))
+                        }</span>
+                        <span class="cov0" title="0">c.JSON(http.StatusInternalServerError, countErrorResponse)
+                        return</span>
+                }
+                <span class="cov0" title="0">log.Printf("📊 数据总数: %d", total)</span>
+        }
+
+        // 添加分页
+        <span class="cov0" title="0">query += " ORDER BY table_schema, table_name, column_name LIMIT ? OFFSET ?"
+        args = append(args, req.Limit, req.Offset)
+
+        // 执行查询
+        log.Printf("🗃️  执行数据库查询...")
+        rows, err := db.Query(query, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("❌ 数据库查询失败: %v", err)
+                queryErrorResponse := ServiceResponse{
+                        Success: false,
+                        Message: "数据库查询失败: " + err.Error(),
+                }
+                // 打印数据库查询失败返回内容
+                if responseJSON, jsonErr := json.Marshal(queryErrorResponse); jsonErr == nil </span><span class="cov0" title="0">{
+                        log.Printf("📄 数据库查询失败返回内容: %s", string(responseJSON))
+                }</span>
+                <span class="cov0" title="0">c.JSON(http.StatusInternalServerError, queryErrorResponse)
+                return</span>
+        }
+        <span class="cov0" title="0">defer rows.Close()
+
+        // 处理查询结果
+        var results []TableMetadata
+        for rows.Next() </span><span class="cov0" title="0">{
+                var meta TableMetadata
+                err := rows.Scan(
+                        &amp;meta.TableSchema, &amp;meta.TableName, &amp;meta.TableComment,
+                        &amp;meta.ColumnName, &amp;meta.ColumnType, &amp;meta.ColumnComment,
+                        &amp;meta.DBType,
+                )
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("❌ 数据扫描失败: %v", err)
+                        scanErrorResponse := ServiceResponse{
+                                Success: false,
+                                Message: "数据扫描失败: " + err.Error(),
+                        }
+                        // 打印数据扫描失败返回内容
+                        if responseJSON, jsonErr := json.Marshal(scanErrorResponse); jsonErr == nil </span><span class="cov0" title="0">{
+                                log.Printf("📄 数据扫描失败返回内容: %s", string(responseJSON))
+                        }</span>
+                        <span class="cov0" title="0">c.JSON(http.StatusInternalServerError, scanErrorResponse)
+                        return</span>
+                }
+                <span class="cov0" title="0">results = append(results, meta)</span>
+        }
+
+        // 构建响应
+        <span class="cov0" title="0">response := ServiceResponse{
+                Success: true,
+                Data:    results,
+        }
+
+        if req.ShowCount == "true" </span><span class="cov0" title="0">{
+                response.Total = total
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("✅ 查询成功完成 - 返回记录数: %d", len(results))
+        if req.ShowCount == "true" </span><span class="cov0" title="0">{
+                log.Printf("📈 总记录数: %d, 当前页: %d-%d", total, req.Offset, req.Offset+len(results))
+        }</span>
+
+        // 打印详细的返回数据内容
+        <span class="cov0" title="0">responseJSON, err := json.Marshal(response)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("❌ JSON序列化失败: %v", err)
+        }</span> else<span class="cov0" title="0"> {
+                log.Printf("📄 返回数据内容:")
+                log.Printf("%s", string(responseJSON))
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, response)</span>
+}
+
+func generateSelfSignedCert() <span class="cov0" title="0">{
+        // 检查证书文件是否存在
+        if fileExists(config.Server.CertFile) &amp;&amp; fileExists(config.Server.KeyFile) </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov0" title="0">log.Println("生成自签名SSL证书...")
+
+        // 这里简化处理，实际生产环境应该使用真实证书
+        // 您可以使用openssl命令生成：
+        // openssl req -x509 -newkey rsa:4096 -keyout server.key -out server.crt -days 365 -nodes -subj "/CN=localhost"
+
+        log.Printf("请手动生成SSL证书文件:")
+        log.Printf("openssl req -x509 -newkey rsa:4096 -keyout %s -out %s -days 365 -nodes -subj \"/CN=localhost\"", config.Server.KeyFile, config.Server.CertFile)
+        log.Fatal("SSL证书文件不存在，请先生成证书文件")</span>
+}
+
+func fileExists(filename string) bool <span class="cov0" title="0">{
+        _, err := http.Dir(".").Open(filename)
+        return err == nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package response
+
+// ServiceResponse 服务响应结构体
+type ServiceResponse struct {
+        Success bool        `json:"success"`
+        Data    interface{} `json:"data"`
+        Total   int64       `json:"total,omitempty"`
+        Message string      `json:"message,omitempty"`
+}
+
+// NewSuccessResponse 创建成功响应
+func NewSuccessResponse(data interface{}) ServiceResponse <span class="cov8" title="1">{
+        return ServiceResponse{
+                Success: true,
+                Data:    data,
+        }
+}</span>
+
+// NewSuccessResponseWithTotal 创建带总数的成功响应
+func NewSuccessResponseWithTotal(data interface{}, total int64) ServiceResponse <span class="cov8" title="1">{
+        return ServiceResponse{
+                Success: true,
+                Data:    data,
+                Total:   total,
+        }
+}</span>
+
+// NewErrorResponse 创建错误响应
+func NewErrorResponse(message string) ServiceResponse <span class="cov8" title="1">{
+        return ServiceResponse{
+                Success: false,
+                Message: message,
+        }
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

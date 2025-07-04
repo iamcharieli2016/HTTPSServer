@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: httpsserver-mysql-dev
+    environment:
+      MYSQL_ROOT_PASSWORD: root123456
+      MYSQL_DATABASE: httpsserver
+      MYSQL_USER: httpsserver
+      MYSQL_PASSWORD: httpsserver123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+      - ./sql/database.sql:/docker-entrypoint-initdb.d/database.sql
+    networks:
+      - httpsserver-dev-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  adminer:
+    image: adminer
+    container_name: httpsserver-adminer-dev
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - httpsserver-dev-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: httpsserver-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - httpsserver-dev-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+volumes:
+  mysql_dev_data:
+  redis_dev_data:
+
+networks:
+  httpsserver-dev-network:
+    driver: bridge 

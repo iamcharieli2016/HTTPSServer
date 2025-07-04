@@ -1,0 +1,80 @@
+2025/07/02 13:14:43 数据库连接成功
+2025/07/02 13:14:43 HTTPS服务器启动在端口18443...
+2025/07/02 13:15:28 🔵 接收到请求 - ServiceID: D_A_BSPDMETA, ClientIP: ::1
+2025/07/02 13:15:28 📋 请求参数 - UserID: 171635, ClientID: eplat, Offset: 0, Limit: 3
+2025/07/02 13:15:28 ✅ 客户端认证成功 - UserID: 171635
+2025/07/02 13:15:28 🔍 开始处理元数据查询请求
+2025/07/02 13:15:28 🔎 搜索条件: [TableName: users]
+2025/07/02 13:15:28 📊 数据总数: 5
+2025/07/02 13:15:28 🗃️  执行数据库查询...
+2025/07/02 13:15:28 ✅ 查询成功完成 - 返回记录数: 3
+2025/07/02 13:15:28 📈 总记录数: 5, 当前页: 0-3
+2025/07/02 13:15:28 📄 返回数据内容:
+2025/07/02 13:15:28 {"success":true,"data":[{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"created_at","columnType":"TIMESTAMP","columnComment":"创建时间","dbType":"mysql"},{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"email","columnType":"VARCHAR(100)","columnComment":"邮箱地址","dbType":"mysql"},{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"id","columnType":"INT AUTO_INCREMENT","columnComment":"用户ID","dbType":"mysql"}],"total":5}
+[2025/07/02 - 13:15:28] ::1 "POST /service/D_A_BSPDMETA HTTP/2.0" 200 36.813ms "curl/8.4.0" "" %!s(int=546)
+[GIN] 2025/07/02 - 13:15:28 | 200 |   37.613666ms |             ::1 | POST     "/service/D_A_BSPDMETA"
+2025/07/02 13:16:02 🔵 接收到请求 - ServiceID: D_A_BSPDMETA, ClientIP: ::1
+2025/07/02 13:16:02 📋 请求参数 - UserID: 171635, ClientID: eplat, Offset: 0, Limit: 100
+2025/07/02 13:16:02 ✅ 客户端认证成功 - UserID: 171635
+2025/07/02 13:16:02 🔍 开始处理元数据查询请求
+2025/07/02 13:16:02 📜 查询所有数据（无搜索条件）
+2025/07/02 13:16:02 📊 数据总数: 17
+2025/07/02 13:16:02 🗃️  执行数据库查询...
+2025/07/02 13:16:02 ✅ 查询成功完成 - 返回记录数: 17
+2025/07/02 13:16:02 📈 总记录数: 17, 当前页: 0-17
+2025/07/02 13:16:02 📄 返回数据内容:
+2025/07/02 13:16:02 {"success":true,"data":[{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"created_at","columnType":"TIMESTAMP","columnComment":"创建时间","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"id","columnType":"INT AUTO_INCREMENT","columnComment":"订单ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"product_id","columnType":"INT","columnComment":"产品ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"quantity","columnType":"INT","columnComment":"数量","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"status","columnType":"ENUM('pending','completed','cancelled')","columnComment":"订单状态","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"total_amount","columnType":"DECIMAL(10,2)","columnComment":"总金额","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"user_id","columnType":"INT","columnComment":"用户ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"products","tableComment":"产品表","columnName":"created_at","columnType":"TIMESTAMP","columnComment":"创建时间","dbType":"mysql"},{"tableSchema":"test_db","tableName":"products","tableComment":"产品表","columnName":"description","columnType":"TEXT","columnComment":"产品描述","dbType":"mysql"},{"tableSchema":"test_db","tableName":"products","tableComment":"产品表","columnName":"id","columnType":"INT AUTO_INCREMENT","columnComment":"产品ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"products","tableComment":"产品表","columnName":"name","columnType":"VARCHAR(255)","columnComment":"产品名称","dbType":"mysql"},{"tableSchema":"test_db","tableName":"products","tableComment":"产品表","columnName":"price","columnType":"DECIMAL(10,2)","columnComment":"产品价格","dbType":"mysql"},{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"created_at","columnType":"TIMESTAMP","columnComment":"创建时间","dbType":"mysql"},{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"email","columnType":"VARCHAR(100)","columnComment":"邮箱地址","dbType":"mysql"},{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"id","columnType":"INT AUTO_INCREMENT","columnComment":"用户ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"updated_at","columnType":"TIMESTAMP","columnComment":"更新时间","dbType":"mysql"},{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"username","columnType":"VARCHAR(50)","columnComment":"用户名","dbType":"mysql"}],"total":17}
+[2025/07/02 - 13:16:02] ::1 "POST /service/D_A_BSPDMETA HTTP/1.1" 200 3.499209ms "python-httpx/0.27.0" "" %!s(int=2952)
+[GIN] 2025/07/02 - 13:16:02 | 200 |    3.524084ms |             ::1 | POST     "/service/D_A_BSPDMETA"
+2025/07/02 14:00:45 🔵 接收到请求 - ServiceID: D_A_BSPDMETA, ClientIP: ::1
+2025/07/02 14:00:45 📋 请求参数 - UserID: 171635, ClientID: eplat, Offset: 0, Limit: 100
+2025/07/02 14:00:45 ✅ 客户端认证成功 - UserID: 171635
+2025/07/02 14:00:45 🔍 开始处理元数据查询请求
+2025/07/02 14:00:45 📜 查询所有数据（无搜索条件）
+2025/07/02 14:00:45 📊 数据总数: 17
+2025/07/02 14:00:45 🗃️  执行数据库查询...
+2025/07/02 14:00:45 ✅ 查询成功完成 - 返回记录数: 17
+2025/07/02 14:00:45 📈 总记录数: 17, 当前页: 0-17
+2025/07/02 14:00:45 📄 返回数据内容:
+2025/07/02 14:00:45 {"success":true,"data":[{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"created_at","columnType":"TIMESTAMP","columnComment":"创建时间","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"id","columnType":"INT AUTO_INCREMENT","columnComment":"订单ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"product_id","columnType":"INT","columnComment":"产品ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"quantity","columnType":"INT","columnComment":"数量","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"status","columnType":"ENUM('pending','completed','cancelled')","columnComment":"订单状态","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"total_amount","columnType":"DECIMAL(10,2)","columnComment":"总金额","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"user_id","columnType":"INT","columnComment":"用户ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"products","tableComment":"产品表","columnName":"created_at","columnType":"TIMESTAMP","columnComment":"创建时间","dbType":"mysql"},{"tableSchema":"test_db","tableName":"products","tableComment":"产品表","columnName":"description","columnType":"TEXT","columnComment":"产品描述","dbType":"mysql"},{"tableSchema":"test_db","tableName":"products","tableComment":"产品表","columnName":"id","columnType":"INT AUTO_INCREMENT","columnComment":"产品ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"products","tableComment":"产品表","columnName":"name","columnType":"VARCHAR(255)","columnComment":"产品名称","dbType":"mysql"},{"tableSchema":"test_db","tableName":"products","tableComment":"产品表","columnName":"price","columnType":"DECIMAL(10,2)","columnComment":"产品价格","dbType":"mysql"},{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"created_at","columnType":"TIMESTAMP","columnComment":"创建时间","dbType":"mysql"},{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"email","columnType":"VARCHAR(100)","columnComment":"邮箱地址","dbType":"mysql"},{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"id","columnType":"INT AUTO_INCREMENT","columnComment":"用户ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"updated_at","columnType":"TIMESTAMP","columnComment":"更新时间","dbType":"mysql"},{"tableSchema":"test_db","tableName":"users","tableComment":"用户表","columnName":"username","columnType":"VARCHAR(50)","columnComment":"用户名","dbType":"mysql"}],"total":17}
+[2025/07/02 - 14:00:45] ::1 "POST /service/D_A_BSPDMETA HTTP/1.1" 200 2.849ms "python-httpx/0.27.0" "" %!s(int=2952)
+[GIN] 2025/07/02 - 14:00:45 | 200 |    2.892542ms |             ::1 | POST     "/service/D_A_BSPDMETA"
+2025/07/02 14:40:04 🔵 接收到请求 - ServiceID: D_A_BSPDMETA, ClientIP: ::1
+2025/07/02 14:40:04 📋 请求参数 - UserID: 171635, ClientID: eplat, Offset: 0, Limit: 100
+2025/07/02 14:40:04 ✅ 客户端认证成功 - UserID: 171635
+2025/07/02 14:40:04 🔍 开始处理元数据查询请求
+2025/07/02 14:40:04 📜 查询所有数据（无搜索条件）
+2025/07/02 14:40:04 📊 数据总数: 7
+2025/07/02 14:40:04 🗃️  执行数据库查询...
+2025/07/02 14:40:04 ✅ 查询成功完成 - 返回记录数: 7
+2025/07/02 14:40:04 📈 总记录数: 7, 当前页: 0-7
+2025/07/02 14:40:04 📄 返回数据内容:
+2025/07/02 14:40:04 {"success":true,"data":[{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"created_at","columnType":"TIMESTAMP","columnComment":"创建时间","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"id","columnType":"INT AUTO_INCREMENT","columnComment":"订单ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"product_id","columnType":"INT","columnComment":"产品ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"quantity","columnType":"INT","columnComment":"数量","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"status","columnType":"ENUM('pending','completed','cancelled')","columnComment":"订单状态","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"total_amount","columnType":"DECIMAL(10,2)","columnComment":"总金额","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"user_id","columnType":"INT","columnComment":"用户ID","dbType":"mysql"}],"total":7}
+[2025/07/02 - 14:40:04] ::1 "POST /service/D_A_BSPDMETA HTTP/1.1" 200 2.812708ms "python-httpx/0.27.0" "" %!s(int=1235)
+[GIN] 2025/07/02 - 14:40:04 | 200 |    2.848667ms |             ::1 | POST     "/service/D_A_BSPDMETA"
+2025/07/02 18:28:00 🔵 接收到请求 - ServiceID: D_A_BSPDMETA, ClientIP: ::1
+2025/07/02 18:28:00 📋 请求参数 - UserID: 171635, ClientID: eplat, Offset: 0, Limit: 100
+2025/07/02 18:28:00 ✅ 客户端认证成功 - UserID: 171635
+2025/07/02 18:28:00 🔍 开始处理元数据查询请求
+2025/07/02 18:28:00 📜 查询所有数据（无搜索条件）
+2025/07/02 18:28:00 📊 数据总数: 7
+2025/07/02 18:28:00 🗃️  执行数据库查询...
+2025/07/02 18:28:00 ✅ 查询成功完成 - 返回记录数: 7
+2025/07/02 18:28:00 📈 总记录数: 7, 当前页: 0-7
+2025/07/02 18:28:00 📄 返回数据内容:
+2025/07/02 18:28:00 {"success":true,"data":[{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"created_at","columnType":"TIMESTAMP","columnComment":"创建时间","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"id","columnType":"INT AUTO_INCREMENT","columnComment":"订单ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"product_id","columnType":"INT","columnComment":"产品ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"quantity","columnType":"INT","columnComment":"数量","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"status","columnType":"ENUM('pending','completed','cancelled')","columnComment":"订单状态","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"total_amount","columnType":"DECIMAL(10,2)","columnComment":"总金额","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"user_id","columnType":"INT","columnComment":"用户ID","dbType":"mysql"}],"total":7}
+[2025/07/02 - 18:28:00] ::1 "POST /service/D_A_BSPDMETA HTTP/1.1" 200 3.204459ms "python-httpx/0.27.0" "" %!s(int=1235)
+[GIN] 2025/07/02 - 18:28:00 | 200 |     3.23175ms |             ::1 | POST     "/service/D_A_BSPDMETA"
+2025/07/02 18:35:41 🔵 接收到请求 - ServiceID: D_A_BSPDMETA, ClientIP: ::1
+2025/07/02 18:35:41 📋 请求参数 - UserID: 171635, ClientID: eplat, Offset: 0, Limit: 100
+2025/07/02 18:35:41 ✅ 客户端认证成功 - UserID: 171635
+2025/07/02 18:35:41 🔍 开始处理元数据查询请求
+2025/07/02 18:35:41 📜 查询所有数据（无搜索条件）
+2025/07/02 18:35:41 📊 数据总数: 7
+2025/07/02 18:35:41 🗃️  执行数据库查询...
+2025/07/02 18:35:41 ✅ 查询成功完成 - 返回记录数: 7
+2025/07/02 18:35:41 📈 总记录数: 7, 当前页: 0-7
+2025/07/02 18:35:41 📄 返回数据内容:
+2025/07/02 18:35:41 {"success":true,"data":[{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"created_at","columnType":"TIMESTAMP","columnComment":"创建时间","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"id","columnType":"INT AUTO_INCREMENT","columnComment":"订单ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"product_id","columnType":"INT","columnComment":"产品ID","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"quantity","columnType":"INT","columnComment":"数量","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"status","columnType":"ENUM('pending','completed','cancelled')","columnComment":"订单状态","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"total_amount","columnType":"DECIMAL(10,2)","columnComment":"总金额","dbType":"mysql"},{"tableSchema":"test_db","tableName":"orders","tableComment":"订单表","columnName":"user_id","columnType":"INT","columnComment":"用户ID","dbType":"mysql"}],"total":7}
+[2025/07/02 - 18:35:41] ::1 "POST /service/D_A_BSPDMETA HTTP/1.1" 200 2.43975ms "python-httpx/0.27.0" "" %!s(int=1235)
+[GIN] 2025/07/02 - 18:35:41 | 200 |      2.4805ms |             ::1 | POST     "/service/D_A_BSPDMETA"
